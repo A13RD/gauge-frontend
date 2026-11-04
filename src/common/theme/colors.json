@@ -1,0 +1,174 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "project": "GAUGE",
+    "version": "1.0.0",
+    "description": "Design tokens, color palettes and UI usage mapping for Dark and Light modes",
+    "palettes": {
+        "steam_cyber_dark": {
+            "name": "Steam Deep Cyberpunk (Dark Mode - Default)",
+            "raw_colors": {
+                "steam_dark": {
+                    "hex": "#171a21",
+                    "rgb": "rgb(23, 26, 33)",
+                    "usage": "Canvas global, fondo raíz de toda la aplicación (body) y barras colapsadas base"
+                },
+                "steam_navy": {
+                    "hex": "#1b2838",
+                    "rgb": "rgb(27, 40, 56)",
+                    "usage": "Superficies de tarjetas (cards), paneles flotantes de navegación (sidebar, dock derecho), contenedores con glassmorphism"
+                },
+                "steam_steel": {
+                    "hex": "#2a475e",
+                    "rgb": "rgb(42, 71, 94)",
+                    "usage": "Bordes de paneles, divisores sutiles, tags de géneros inactivos, fondos de inputs y barras de progreso secundarias"
+                },
+                "steam_blue": {
+                    "hex": "#66c0f4",
+                    "rgb": "rgb(102, 192, 244)",
+                    "usage": "Botones de acción primaria (CTA), acentos luminosos (glow), bordes al hacer hover en cards, anillos de rating y gráficas activas"
+                },
+                "steam_light": {
+                    "hex": "#c7d5e0",
+                    "rgb": "rgb(199, 213, 224)",
+                    "usage": "Texto secundario, párrafos de reseñas, descripciones de videojuegos, metadatos (fechas, horas jugadas)"
+                },
+                "pure_white": {
+                    "hex": "#ffffff",
+                    "rgb": "rgb(255, 255, 255)",
+                    "usage": "Títulos principales (H1, H2), nombres de videojuegos en Hero, textos en botones con fondo oscuro"
+                }
+            },
+            "ui_element_mapping": {
+                "background_canvas": {
+                    "color": "#171a21",
+                    "tailwind_class": "bg-[#171a21]",
+                    "where_to_use": "Etiqueta body en layout.tsx, contenedor principal <main>"
+                },
+                "glass_sidebar_left": {
+                    "color": "rgba(27, 40, 56, 0.85)",
+                    "tailwind_class": "bg-[#1b2838]/85 backdrop-blur-xl border-r border-[#2a475e]/40",
+                    "where_to_use": "Barra lateral colapsable / expandible con logo y enlaces de navegación"
+                },
+                "glass_dock_right": {
+                    "color": "rgba(27, 40, 56, 0.75)",
+                    "tailwind_class": "bg-[#1b2838]/75 backdrop-blur-lg border border-[#2a475e]/30 shadow-2xl",
+                    "where_to_use": "Isla flotante derecha: perfil de usuario, lista rápida de amigos y accesos de configuración"
+                },
+                "hero_card_featured": {
+                    "color": "rgba(27, 40, 56, 0.9)",
+                    "tailwind_class": "bg-[#1b2838]/90 backdrop-blur-md border border-[#66c0f4]/30 shadow-[0_0_25px_rgba(102,192,244,0.15)]",
+                    "where_to_use": "Tarjeta principal destacada en inicio (estilo Valorant) que se expande al hacer clic"
+                },
+                "catalog_game_card": {
+                    "color": "#1b2838",
+                    "tailwind_class": "bg-[#1b2838] border border-[#2a475e]/50 hover:border-[#66c0f4] hover:shadow-[0_0_15px_rgba(102,192,244,0.3)] transition-all",
+                    "where_to_use": "Grilla de catálogo y carrusel de 'Nuevos Juegos'"
+                },
+                "stats_widget_hours": {
+                    "color": "#1b2838",
+                    "tailwind_class": "bg-[#1b2838]/90 border border-[#2a475e]/60",
+                    "chart_accent": "#66c0f4",
+                    "chart_track": "#2a475e",
+                    "where_to_use": "Widget circular y gráfico de barras Recharts de 'Your Statistics' / horas jugadas"
+                },
+                "review_rating_pill": {
+                    "color": "#66c0f4",
+                    "tailwind_class": "bg-[#66c0f4]/15 border border-[#66c0f4] text-[#66c0f4]",
+                    "where_to_use": "Insignias de nota numérica (ej. 9.5) estilo PlayStation / Spider-Man"
+                },
+                "button_primary": {
+                    "color": "#66c0f4",
+                    "tailwind_class": "bg-[#66c0f4] text-[#171a21] font-bold hover:bg-[#4199c9] hover:shadow-[0_0_15px_rgba(102,192,244,0.4)]",
+                    "where_to_use": "Botón 'Crear Reseña', 'Publicar', 'Iniciar Sesión', 'Verificar Horas'"
+                },
+                "button_secondary": {
+                    "color": "#2a475e",
+                    "tailwind_class": "bg-[#2a475e]/40 border border-[#2a475e] text-[#c7d5e0] hover:bg-[#2a475e]/80 hover:text-white",
+                    "where_to_use": "Botones de filtrado de géneros, cancelar modales, paginación"
+                },
+                "inputs_forms": {
+                    "color": "#171a21",
+                    "tailwind_class": "bg-[#171a21]/80 border border-[#2a475e] text-white focus:border-[#66c0f4] focus:ring-1 focus:ring-[#66c0f4]",
+                    "where_to_use": "Inputs de texto, select de videojuegos, barra de búsqueda superior y textarea de reseñas"
+                }
+            }
+        },
+        "clean_frost_light": {
+            "name": "Clean Frost Arcade (Light Mode - Alternativo)",
+            "raw_colors": {
+                "frost_bg": {
+                    "hex": "#f0f4f8",
+                    "rgb": "rgb(240, 244, 248)",
+                    "usage": "Canvas global, fondo claro frío anti-fatiga visual"
+                },
+                "pure_card": {
+                    "hex": "#ffffff",
+                    "rgb": "rgb(255, 255, 255)",
+                    "usage": "Superficies de tarjetas, modales y barras de navegación claras"
+                },
+                "frost_steel": {
+                    "hex": "#c7d5e0",
+                    "rgb": "rgb(199, 213, 224)",
+                    "usage": "Bordes de paneles, divisores, inputs inactivos y bordes de cápsulas"
+                },
+                "deep_navy": {
+                    "hex": "#1b2838",
+                    "rgb": "rgb(27, 40, 56)",
+                    "usage": "Botones de acción principal en modo claro, acentos con alto contraste"
+                },
+                "active_slate": {
+                    "hex": "#2a475e",
+                    "rgb": "rgb(42, 71, 94)",
+                    "usage": "Texto secundario, párrafos y estados hover de botones"
+                },
+                "charcoal_text": {
+                    "hex": "#171a21",
+                    "rgb": "rgb(23, 26, 33)",
+                    "usage": "Títulos y encabezados con máximo contraste sobre fondo blanco"
+                },
+                "sky_accent": {
+                    "hex": "#0284c7",
+                    "rgb": "rgb(2, 132, 199)",
+                    "usage": "Enlaces activos, acentos de selección y badges informativos"
+                }
+            },
+            "ui_element_mapping": {
+                "background_canvas": {
+                    "color": "#f0f4f8",
+                    "tailwind_class": "bg-[#f0f4f8]",
+                    "where_to_use": "Fondo general en modo claro"
+                },
+                "glass_sidebar_left": {
+                    "color": "rgba(255, 255, 255, 0.85)",
+                    "tailwind_class": "bg-white/85 backdrop-blur-xl border-r border-[#c7d5e0]/60",
+                    "where_to_use": "Barra lateral izquierda en modo claro"
+                },
+                "glass_dock_right": {
+                    "color": "rgba(255, 255, 255, 0.9)",
+                    "tailwind_class": "bg-white/90 backdrop-blur-lg border border-[#c7d5e0]/60 shadow-lg shadow-[#2a475e]/5",
+                    "where_to_use": "Isla flotante derecha en modo claro"
+                },
+                "catalog_game_card": {
+                    "color": "#ffffff",
+                    "tailwind_class": "bg-white border border-[#c7d5e0]/60 hover:border-[#1b2838] hover:shadow-md transition-all",
+                    "where_to_use": "Tarjetas de catálogo de juegos en modo claro"
+                },
+                "button_primary": {
+                    "color": "#1b2838",
+                    "tailwind_class": "bg-[#1b2838] text-white font-bold hover:bg-[#2a475e] shadow-md",
+                    "where_to_use": "Botones principales en modo claro"
+                },
+                "button_secondary": {
+                    "color": "#f0f4f8",
+                    "tailwind_class": "bg-[#f0f4f8] border border-[#c7d5e0] text-[#171a21] hover:bg-[#c7d5e0]/40",
+                    "where_to_use": "Botones secundarios en modo claro"
+                },
+                "inputs_forms": {
+                    "color": "#ffffff",
+                    "tailwind_class": "bg-white border border-[#c7d5e0] text-[#171a21] focus:border-[#1b2838] focus:ring-1 focus:ring-[#1b2838]",
+                    "where_to_use": "Formularios e inputs en modo claro"
+                }
+            }
+        }
+    }
+}
