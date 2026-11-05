@@ -1,26 +1,213 @@
 @import "tailwindcss";
 
+@theme {
+  /* Paleta Dark Mode — Steam Deep Cyberpunk */
+  --color-steam-dark: #171a21;
+  --color-steam-navy: #1b2838;
+  --color-steam-steel: #2a475e;
+  --color-steam-blue: #66c0f4;
+  --color-steam-cyan: #66c0f4;
+  --color-steam-light: #c7d5e0;
+  --color-pure-white: #ffffff;
+
+  /* Paleta Light Mode — Clean Frost Arcade */
+  --color-frost-bg: #f0f4f8;
+  --color-pure-card: #ffffff;
+  --color-frost-steel: #c7d5e0;
+  --color-deep-navy: #1b2838;
+  --color-active-slate: #2a475e;
+  --color-charcoal-text: #171a21;
+  --color-sky-accent: #0284c7;
+
+  /* Mapeo dinámico dependiente de variables CSS */
+  --color-gauge-bg: var(--gauge-bg);
+  --color-gauge-surface: var(--gauge-surface);
+  --color-gauge-surface-elevated: var(--gauge-surface-elevated);
+  --color-gauge-border: var(--gauge-border);
+  --color-gauge-border-subtle: var(--gauge-border-subtle);
+  --color-gauge-text-primary: var(--gauge-text-primary);
+  --color-gauge-text-secondary: var(--gauge-text-secondary);
+  --color-gauge-accent: var(--gauge-accent);
+  --color-gauge-accent-hover: var(--gauge-accent-hover);
+
+  --font-sans: var(--font-sans, 'Inter', system-ui, -apple-system, sans-serif);
+  --font-mono: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+/* Variables semánticas para Dark Mode (Predeterminado) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gauge-bg: #171a21;
+  --gauge-surface: #1b2838;
+  --gauge-surface-elevated: #243549;
+  --gauge-glass-bg: rgba(27, 40, 56, 0.78);
+  --gauge-glass-hover-bg: rgba(42, 71, 94, 0.65);
+  --gauge-border: #2a475e;
+  --gauge-border-subtle: rgba(42, 71, 94, 0.45);
+  --gauge-border-glass: rgba(255, 255, 255, 0.08);
+  --gauge-border-hover: rgba(102, 192, 244, 0.5);
+  --gauge-text-primary: #ffffff;
+  --gauge-text-secondary: #c7d5e0;
+  --gauge-accent: #66c0f4;
+  --gauge-accent-hover: #4199c9;
+  --gauge-accent-glow: rgba(102, 192, 244, 0.35);
+  --gauge-card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Variables semánticas para Light Mode */
+html.light {
+  --gauge-bg: #f0f4f8;
+  --gauge-surface: #ffffff;
+  --gauge-surface-elevated: #f8fafc;
+  --gauge-glass-bg: rgba(255, 255, 255, 0.88);
+  --gauge-glass-hover-bg: rgba(240, 244, 248, 0.95);
+  --gauge-border: #c7d5e0;
+  --gauge-border-subtle: rgba(199, 213, 224, 0.7);
+  --gauge-border-glass: rgba(199, 213, 224, 0.8);
+  --gauge-border-hover: #0284c7;
+  --gauge-text-primary: #171a21;
+  --gauge-text-secondary: #2a475e;
+  --gauge-accent: #0284c7;
+  --gauge-accent-hover: #0369a1;
+  --gauge-accent-glow: rgba(2, 132, 199, 0.25);
+  --gauge-card-shadow: 0 8px 24px 0 rgba(42, 71, 94, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Clases utilitarias Neo-Arcade Glassmorphism */
+.glass-panel {
+  background-color: var(--gauge-glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--gauge-border-glass);
+  box-shadow: var(--gauge-card-shadow);
+}
+
+.glass-panel-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  background-color: var(--gauge-glass-hover-bg);
+  border-color: var(--gauge-border-hover);
+  box-shadow: 0 0 20px var(--gauge-accent-glow);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 16px var(--gauge-accent-glow);
+}
+
+/* Curvatura cóncava para elemento activo en Sidebar de escritorio */
+.concave-active {
+  position: relative;
+  background-color: var(--gauge-surface);
+  color: var(--gauge-accent);
+}
+
+@media (min-width: 1024px) {
+  .concave-active::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    border-bottom-right-radius: 16px;
+    box-shadow: 4px 4px 0 4px var(--gauge-surface);
+    pointer-events: none;
+  }
+
+  .concave-active::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    border-top-right-radius: 16px;
+    box-shadow: 4px -4px 0 4px var(--gauge-surface);
+    pointer-events: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Botones universales Neo-Arcade */
+.btn-primary {
+  background-color: var(--gauge-accent);
+  color: #171a21;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px var(--gauge-accent-glow);
+}
+
+html.light .btn-primary {
+  background-color: #1b2838;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(27, 40, 56, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 0 18px var(--gauge-accent-glow);
+}
+
+html.light .btn-primary:hover:not(:disabled) {
+  background-color: #2a475e;
+  box-shadow: 0 6px 16px rgba(27, 40, 56, 0.35);
+}
+
+.btn-secondary {
+  background-color: rgba(42, 71, 94, 0.35);
+  border: 1px solid var(--gauge-border);
+  color: var(--gauge-text-secondary);
+  transition: all 0.2s ease;
+}
+
+html.light .btn-secondary {
+  background-color: #f0f4f8;
+  border: 1px solid var(--gauge-border);
+  color: #171a21;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(42, 71, 94, 0.7);
+  color: #ffffff;
+  border-color: var(--gauge-accent);
+}
+
+html.light .btn-secondary:hover:not(:disabled) {
+  background-color: #e2e8f0;
+  color: #171a21;
+  border-color: #0284c7;
+}
+
+/* Scrollbar discreto para consolas */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gauge-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gauge-accent);
+}
+
+/* Respeto a usuarios con sensibilidad a movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
