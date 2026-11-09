@@ -3,10 +3,6 @@ import Link from 'next/link';
 import {
   User as UserIcon,
   BarChart3,
-  Clock,
-  Sparkles,
-  SquarePen,
-  Compass,
 } from 'lucide-react';
 import { Button } from './Button';
 
@@ -24,11 +20,11 @@ export function RightDock({
   return (
     <aside
       aria-label="Panel lateral complementario"
-      className={`hidden xl:flex flex-col w-80 shrink-0 z-20 ${className}`}
+      className={`hidden xl:flex flex-col w-80 shrink-0 z-20 self-start lg:h-full ${className}`}
     >
       <div className="glass-panel h-full flex flex-col p-5 rounded-3xl border border-frost-steel dark:border-steam-steel/40 shadow-2xl transition-all gap-5 overflow-y-auto">
         {/* Encabezado del Dock */}
-        <div className="flex items-center justify-between pb-3 border-b border-frost-steel dark:border-steam-steel/30">
+        <div className="flex items-center justify-between pb-3 border-b border-frost-steel dark:border-steam-steel/30 shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-sky-accent dark:bg-steam-blue animate-pulse shadow-[0_0_8px_rgba(102,192,244,0.8)]" />
             <h2 className="text-xs font-bold uppercase tracking-wider text-charcoal-text dark:text-pure-white font-mono">
@@ -44,7 +40,7 @@ export function RightDock({
         {children || (
           <div className="flex flex-col gap-5">
             {/* 1. Widget de Perfil / Estado de Sesión */}
-            <div className="p-4 rounded-2xl bg-white dark:bg-steam-navy/80 border border-frost-steel dark:border-steam-steel/50 shadow-sm flex flex-col gap-3">
+            <div className="p-4 rounded-2xl bg-white dark:bg-steam-navy/80 border border-frost-steel dark:border-steam-steel/50 shadow-sm flex flex-col gap-3 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-frost-bg dark:bg-steam-steel/40 border border-frost-steel dark:border-steam-steel/60 flex items-center justify-center text-sky-accent dark:text-steam-blue shadow-inner shrink-0">
                   <UserIcon className="w-6 h-6" aria-hidden="true" />
@@ -67,7 +63,7 @@ export function RightDock({
             </div>
 
             {/* 2. Widget "Your Statistics" (Métricas & Anillo Visual) */}
-            <div className="p-4 rounded-2xl bg-white dark:bg-steam-navy/80 border border-frost-steel dark:border-steam-steel/50 shadow-sm flex flex-col gap-3">
+            <div className="p-4 rounded-2xl bg-white dark:bg-steam-navy/80 border border-frost-steel dark:border-steam-steel/50 shadow-sm flex flex-col gap-3 shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-sky-accent dark:text-steam-blue" aria-hidden="true" />
@@ -143,33 +139,6 @@ export function RightDock({
               <p className="text-[11px] text-active-slate/70 dark:text-steam-light/70 leading-relaxed text-center pt-2">
                 Conecta tu cuenta para sincronizar tus horas de gameplay y desbloquear tu gráfico analítico.
               </p>
-            </div>
-
-            {/* 3. Accesos Rápidos */}
-            <div className="p-4 rounded-2xl bg-white dark:bg-steam-navy/80 border border-frost-steel dark:border-steam-steel/50 shadow-sm flex flex-col gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-active-slate/80 dark:text-steam-light/70 font-mono mb-1">
-                Accesos Directos
-              </span>
-              <Link href="/resenas/nueva">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="w-full justify-start text-xs"
-                  leftIcon={<SquarePen className="w-4 h-4" />}
-                >
-                  Publicar Reseña
-                </Button>
-              </Link>
-              <Link href="/catalogo">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full justify-start text-xs"
-                  leftIcon={<Compass className="w-4 h-4" />}
-                >
-                  Explorar Catálogo
-                </Button>
-              </Link>
             </div>
           </div>
         )}

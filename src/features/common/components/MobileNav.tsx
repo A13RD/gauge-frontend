@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   House,
   Gamepad2,
-  SquarePen,
+  Plus,
   MessageSquareText,
   X,
   Gauge,
@@ -57,14 +57,47 @@ export function MobileNav({ isOpen, onClose, isAdmin = false }: MobileNavProps) 
 
   return (
     <>
-      {/* 1. Barra de navegación inferior flotante (Mobile & Tablet < lg) */}
+      {/* 1. Barra de navegación inferior flotante con botón central '+' distinguible */}
       <nav
         aria-label="Navegación inferior móvil"
-        className="lg:hidden fixed bottom-3 inset-x-3 z-40 max-w-lg mx-auto"
+        className="lg:hidden fixed bottom-3 inset-x-3 z-40 max-w-lg mx-auto pb-[env(safe-area-inset-bottom,0px)]"
       >
-        <div className="glass-panel rounded-2xl py-1.5 px-2 border border-frost-steel dark:border-steam-steel/50 shadow-2xl flex items-center justify-around gap-1">
+        <div className="glass-panel rounded-2xl py-1.5 px-3 border border-frost-steel dark:border-steam-steel/50 shadow-2xl flex items-center justify-around gap-1">
           {BOTTOM_ITEMS.map((item) => {
             const active = isActive(item.href);
+            const isPublishAction = item.href === '/resenas/nueva';
+
+            if (isPublishAction) {
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? 'page' : undefined}
+                  className="relative -top-3 flex flex-col items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue rounded-2xl"
+                  aria-label="Publicar nueva reseña"
+                >
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 active:scale-95 shadow-lg ${
+                      active
+                        ? 'bg-deep-navy dark:bg-steam-blue text-white dark:text-steam-dark ring-2 ring-sky-accent dark:ring-steam-blue shadow-sky-accent/30 dark:shadow-[0_0_20px_rgba(102,192,244,0.6)]'
+                        : 'bg-deep-navy dark:bg-steam-blue text-white dark:text-steam-dark shadow-deep-navy/30 dark:shadow-[0_0_15px_rgba(102,192,244,0.4)] border border-sky-accent/50 dark:border-steam-blue'
+                    }`}
+                  >
+                    <Plus className="w-6 h-6 stroke-[3]" aria-hidden="true" />
+                  </div>
+                  <span
+                    className={`text-[10px] tracking-tight font-mono font-bold mt-0.5 ${
+                      active
+                        ? 'text-sky-accent dark:text-steam-blue'
+                        : 'text-charcoal-text dark:text-pure-white'
+                    }`}
+                  >
+                    Reseñar
+                  </span>
+                </Link>
+              );
+            }
+
             const Icon = item.icon;
 
             return (
@@ -72,7 +105,7 @@ export function MobileNav({ isOpen, onClose, isAdmin = false }: MobileNavProps) 
                 key={item.href}
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl transition-all duration-200 min-w-[68px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue ${
+                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl transition-all duration-200 min-w-[64px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue ${
                   active
                     ? 'text-sky-accent dark:text-steam-blue font-bold scale-105 bg-frost-steel/40 dark:bg-steam-steel/40 shadow-inner'
                     : 'text-active-slate/80 dark:text-steam-light/80 hover:text-charcoal-text dark:hover:text-pure-white'

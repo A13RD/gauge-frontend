@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   House,
   Gamepad2,
-  SquarePen,
+  Plus,
   MessageSquareText,
   ShieldCheck,
   ChevronLeft,
@@ -24,7 +24,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Inicio', href: '/', icon: House },
   { label: 'Catálogo', href: '/catalogo', icon: Gamepad2 },
-  { label: 'Reseñar', href: '/resenas/nueva', icon: SquarePen },
+  { label: 'Reseñar', href: '/resenas/nueva', icon: Plus },
   { label: 'Mis reseñas', href: '/mis-reseñas', icon: MessageSquareText },
   { label: 'Administración', href: '/admin', icon: ShieldCheck, adminOnly: true },
 ];
@@ -67,7 +67,7 @@ export function Sidebar({
   return (
     <aside
       aria-label="Navegación principal de escritorio"
-      className={`hidden lg:flex flex-col z-30 transition-all duration-300 ease-in-out shrink-0 ${
+      className={`hidden lg:flex flex-col z-30 transition-all duration-300 ease-in-out shrink-0 self-start lg:h-full max-h-full ${
         isExpanded ? 'w-60' : 'w-20'
       } ${className}`}
     >
