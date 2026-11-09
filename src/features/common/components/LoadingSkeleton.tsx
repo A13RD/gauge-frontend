@@ -36,11 +36,10 @@ export function LoadingSkeleton({
       {skeletons.map((_, index) => (
         <div
           key={index}
-          className={`animate-pulse bg-steam-steel/25 border border-steam-steel/30 dark:bg-steam-steel/25 dark:border-steam-steel/30 light:bg-frost-steel/30 light:border-frost-steel/50 ${getVariantClasses()} ${className}`}
+          className={`animate-pulse bg-frost-steel/40 border border-frost-steel/60 dark:bg-steam-steel/25 dark:border-steam-steel/30 ${getVariantClasses()} ${className}`}
         />
       ))}
       <span className="sr-only">Cargando...</span>
     </div>
   );
 }
-
