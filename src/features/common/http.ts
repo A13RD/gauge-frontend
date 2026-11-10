@@ -78,10 +78,14 @@ async function request<T>(
 
   // 3. Manejo de 401 Unauthorized
   if (response.status === 401) {
-    const isLoginEndpoint = normalizedEndpoint.includes('/auth/login');
-    if (typeof window !== 'undefined' && !isLoginEndpoint) {
+    const isAuthEndpoint =
+      normalizedEndpoint.includes('/auth/login') ||
+      normalizedEndpoint.includes('/auth/register');
+
+    if (typeof window !== 'undefined' && !isAuthEndpoint) {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
       localStorage.removeItem(USER_STORAGE_KEY);
+      window.dispatchEvent(new Event('gauge:unauthorized'));
       if (!window.location.pathname.startsWith('/login')) {
         window.location.href = '/login?expired=true';
       }

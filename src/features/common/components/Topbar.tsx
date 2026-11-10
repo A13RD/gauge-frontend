@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Search, Menu, Gauge, User as UserIcon } from 'lucide-react';
+import { Search, Menu, Gauge, User as UserIcon, LogOut, ShieldCheck } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { useAuth } from '@/features/auth';
 
 interface TopbarProps {
   onOpenMobileMenu?: () => void;
@@ -11,6 +12,7 @@ interface TopbarProps {
 }
 
 export function Topbar({ onOpenMobileMenu, className = '' }: TopbarProps) {
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   return (
     <header
       role="banner"
@@ -59,14 +61,43 @@ export function Topbar({ onOpenMobileMenu, className = '' }: TopbarProps) {
         <ThemeToggle />
 
         {/* Acceso a Iniciar Sesión / Perfil */}
-        <Link
-          href="/login"
-          aria-label="Acceder a mi cuenta de jugador"
-          className="inline-flex items-center gap-2 min-h-[42px] px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white dark:bg-steam-steel/30 text-charcoal-text dark:text-steam-light hover:bg-frost-bg dark:hover:bg-steam-steel/60 hover:text-deep-navy dark:hover:text-pure-white border border-frost-steel dark:border-steam-steel/50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue shrink-0 shadow-sm"
-        >
-          <UserIcon className="w-4 h-4 text-sky-accent dark:text-steam-blue shrink-0" aria-hidden="true" />
-          <span className="hidden sm:inline">Iniciar Sesión</span>
-        </Link>
+        {isAuthenticated && user ? (
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-steam-steel/30 border border-frost-steel dark:border-steam-steel/50 shadow-sm text-xs font-medium text-charcoal-text dark:text-pure-white">
+              <div className="w-6 h-6 rounded-lg bg-sky-accent/20 dark:bg-steam-blue/20 flex items-center justify-center font-mono font-bold text-[11px] text-sky-accent dark:text-steam-blue">
+                {user.name.substring(0, 2).toUpperCase()}
+              </div>
+              <span className="hidden sm:inline font-semibold truncate max-w-[120px]">
+                {user.name}
+              </span>
+              {isAdmin && (
+                <span className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                  <ShieldCheck className="w-3 h-3" />
+                  ADMIN
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={logout}
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+              className="inline-flex items-center justify-center min-w-[38px] min-h-[38px] p-2 rounded-xl text-active-slate/70 dark:text-steam-light/70 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-500/10 border border-frost-steel dark:border-steam-steel/50 transition-colors cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            aria-label="Acceder a mi cuenta de jugador"
+            className="inline-flex items-center gap-2 min-h-[42px] px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white dark:bg-steam-steel/30 text-charcoal-text dark:text-steam-light hover:bg-frost-bg dark:hover:bg-steam-steel/60 hover:text-deep-navy dark:hover:text-pure-white border border-frost-steel dark:border-steam-steel/50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue shrink-0 shadow-sm"
+          >
+            <UserIcon className="w-4 h-4 text-sky-accent dark:text-steam-blue shrink-0" aria-hidden="true" />
+            <span className="hidden sm:inline">Iniciar Sesión</span>
+          </Link>
+        )}
 
         {/* Botón Hamburguesa: Posicionado a la derecha en móvil según boceto oficial */}
         {onOpenMobileMenu && (

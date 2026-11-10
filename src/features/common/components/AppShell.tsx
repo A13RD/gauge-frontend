@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { MobileNav } from './MobileNav';
 import { RightDock } from './RightDock';
+import { useAuth } from '@/features/auth';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ export function AppShell({
   rightDockContent,
   showRightDock = true,
 }: AppShellProps) {
+  const { isAdmin } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
@@ -41,6 +43,7 @@ export function AppShell({
           <Sidebar
             isExpanded={isSidebarExpanded}
             onToggleExpanded={handleToggleSidebar}
+            isAdmin={isAdmin}
           />
         </Suspense>
 
@@ -66,6 +69,7 @@ export function AppShell({
         <MobileNav
           isOpen={isMobileMenuOpen}
           onClose={handleCloseMobileMenu}
+          isAdmin={isAdmin}
         />
       </Suspense>
     </div>

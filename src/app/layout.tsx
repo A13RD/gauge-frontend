@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/features/common/hooks/useTheme';
+import { AuthProvider } from '@/features/auth';
 
 export const metadata: Metadata = {
   title: 'GAUGE — Gaming Assessment & User Gameplay Evaluation',
@@ -41,7 +42,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-gauge-bg text-gauge-text-primary antialiased selection:bg-steam-blue selection:text-steam-dark font-sans">
         <ThemeProvider>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

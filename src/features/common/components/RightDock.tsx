@@ -3,8 +3,12 @@ import Link from 'next/link';
 import {
   User as UserIcon,
   BarChart3,
+  LogOut,
+  ShieldCheck,
+  UserPlus,
 } from 'lucide-react';
 import { Button } from './Button';
+import { useAuth } from '@/features/auth';
 
 export interface RightDockProps {
   children?: React.ReactNode;
@@ -17,6 +21,7 @@ export function RightDock({
   title = 'Centro de Control',
   className = '',
 }: RightDockProps) {
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   return (
     <aside
       aria-label="Panel lateral complementario"
@@ -41,25 +46,78 @@ export function RightDock({
           <div className="flex flex-col gap-5">
             {/* 1. Widget de Perfil / Estado de Sesión */}
             <div className="p-4 rounded-2xl bg-white dark:bg-steam-navy/80 border border-frost-steel dark:border-steam-steel/50 shadow-sm flex flex-col gap-3 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-frost-bg dark:bg-steam-steel/40 border border-frost-steel dark:border-steam-steel/60 flex items-center justify-center text-sky-accent dark:text-steam-blue shadow-inner shrink-0">
-                  <UserIcon className="w-6 h-6" aria-hidden="true" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-bold text-charcoal-text dark:text-pure-white truncate">
-                    Jugador Invitado
-                  </h3>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-active-slate/80 dark:text-steam-light/80">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    Modo Espectador
-                  </span>
-                </div>
-              </div>
-              <Link href="/login" className="w-full">
-                <Button variant="outline" size="sm" className="w-full text-xs">
-                  Iniciar Sesión
-                </Button>
-              </Link>
+              {isAuthenticated && user ? (
+                <>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-sky-accent/20 dark:bg-steam-blue/20 border border-sky-accent/40 dark:border-steam-blue/40 flex items-center justify-center font-mono font-black text-sm text-sky-accent dark:text-steam-blue shadow-inner shrink-0">
+                      {user.name.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-bold text-charcoal-text dark:text-pure-white truncate">
+                        {user.name}
+                      </h3>
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-active-slate/80 dark:text-steam-light/80 truncate">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isAdmin ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                        {isAdmin ? 'Administrador' : 'Jugador Verificado'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 pt-1 border-t border-frost-steel/60 dark:border-steam-steel/30">
+                    {isAdmin && (
+                      <Link href="/admin" className="w-full">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="w-full text-xs"
+                          leftIcon={<ShieldCheck className="w-3.5 h-3.5" />}
+                        >
+                          Panel Administrativo
+                        </Button>
+                      </Link>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={logout}
+                      className="w-full text-xs text-rose-500 dark:text-rose-400 hover:border-rose-500"
+                      leftIcon={<LogOut className="w-3.5 h-3.5" />}
+                    >
+                      Cerrar Sesión
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-frost-bg dark:bg-steam-steel/40 border border-frost-steel dark:border-steam-steel/60 flex items-center justify-center text-sky-accent dark:text-steam-blue shadow-inner shrink-0">
+                      <UserIcon className="w-6 h-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-bold text-charcoal-text dark:text-pure-white truncate">
+                        Jugador Invitado
+                      </h3>
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-active-slate/80 dark:text-steam-light/80">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        Modo Espectador
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <Link href="/login" className="flex-1">
+                      <Button variant="primary" size="sm" className="w-full text-xs">
+                        Iniciar Sesión
+                      </Button>
+                    </Link>
+                    <Link href="/register" className="flex-1">
+                      <Button variant="secondary" size="sm" className="w-full text-xs" leftIcon={<UserPlus className="w-3 h-3" />}>
+                        Registro
+                      </Button>
+                    </Link>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* 2. Widget "Your Statistics" (Métricas & Anillo Visual) */}

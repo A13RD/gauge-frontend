@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AppShell } from '@/features/common/components/AppShell';
 import { Button } from '@/features/common/components/Button';
+import { ProtectedRoute } from '@/features/auth';
 import { useGames } from '@/features/games/hooks/useGames';
 import {
   SquarePen,
@@ -205,9 +206,11 @@ function NuevaResenaContent() {
 export default function NuevaResenaPage() {
   return (
     <AppShell>
-      <Suspense fallback={<div className="py-12 text-center">Cargando formulario...</div>}>
-        <NuevaResenaContent />
-      </Suspense>
+      <ProtectedRoute>
+        <Suspense fallback={<div className="py-12 text-center">Cargando formulario...</div>}>
+          <NuevaResenaContent />
+        </Suspense>
+      </ProtectedRoute>
     </AppShell>
   );
 }

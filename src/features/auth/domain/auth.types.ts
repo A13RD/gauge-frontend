@@ -12,6 +12,10 @@ export interface AuthResponse {
   token: string;
 }
 
+export interface UserProfileResponse {
+  user: User;
+}
+
 export interface LoginDTO {
   email: string;
   password: string;
@@ -23,3 +27,16 @@ export interface RegisterDTO {
   password: string;
 }
 
+export interface RegisterFormErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  general?: string;
+}
+
+export interface LoginFormErrors {
+  email?: string;
+  password?: string;
+  general?: string;
+}

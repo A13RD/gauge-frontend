@@ -1,32 +1,26 @@
-import React from 'react';
-import Link from 'next/link';
+'use client';
+
+import React, { Suspense } from 'react';
 import { AppShell } from '@/features/common/components/AppShell';
-import { EmptyState } from '@/features/common/components/EmptyState';
-import { Button } from '@/features/common/components/Button';
-import { UserPlus, Lock } from 'lucide-react';
+import { RegisterForm, PublicOnlyRoute } from '@/features/auth';
+import { Loader2 } from 'lucide-react';
 
 export default function RegisterPage() {
   return (
-    <AppShell>
-      <div className="py-8">
-        <EmptyState
-          icon={<UserPlus className="w-8 h-8" />}
-          title="Registro de Jugador"
-          description="El formulario reactivo de creación de cuenta y verificación de seguridad se implementará en la Etapa 2."
-          action={
-            <Link href="/login">
-              <Button
-                variant="outline"
-                size="sm"
-                leftIcon={<Lock className="w-4 h-4" />}
-              >
-                ¿Ya tienes cuenta? Iniciar Sesión
-              </Button>
-            </Link>
-          }
-        />
-      </div>
+    <AppShell showRightDock={false}>
+      <PublicOnlyRoute>
+        <div className="py-6 sm:py-12 flex items-center justify-center min-h-[calc(100vh-160px)]">
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-sky-accent dark:text-steam-blue" />
+              </div>
+            }
+          >
+            <RegisterForm />
+          </Suspense>
+        </div>
+      </PublicOnlyRoute>
     </AppShell>
   );
 }
-
