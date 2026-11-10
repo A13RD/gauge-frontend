@@ -32,12 +32,20 @@ export function useGameDetail(id: string): UseGameDetailResult {
 
     try {
       const data = await gamesService.getGameById(id);
-      setGame(data);
+      const gameData =
+        data && typeof data === 'object' && 'data' in data && (data as { data: Game }).data
+          ? (data as { data: Game }).data
+          : data;
+      setGame(gameData);
     } catch (err: unknown) {
       if (err instanceof HttpClientError) {
         setStatusCode(err.statusCode);
         if (err.statusCode === 404) {
-          setError('El videojuego solicitado no existe o fue retirado del catálogo');
+          setError(
+            err.message === 'Ruta no encontrada'
+              ? 'El endpoint (/api/games/:id) aún no ha sido expuesto en el backend (HTTP 404).'
+              : 'El videojuego solicitado no existe o fue retirado del catálogo'
+          );
         } else {
           setError(err.message || 'Error al cargar la información del videojuego');
         }

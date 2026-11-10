@@ -25,8 +25,9 @@ async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
+  const cleanBaseUrl = API_BASE_URL.replace(/\/+$/, '');
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${API_BASE_URL}${normalizedEndpoint}`;
+  const url = `${cleanBaseUrl}${normalizedEndpoint}`;
 
   const headers = new Headers(options.headers || {});
 

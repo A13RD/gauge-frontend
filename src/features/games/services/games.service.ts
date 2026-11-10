@@ -14,7 +14,7 @@ export const gamesService = {
    * Obtiene el listado paginado de videojuegos con soporte de filtros
    * GET /api/games?page=1&limit=10&genre=...&search=...&sort=...
    */
-  async getGames(filter: GameFilter = {}): Promise<PaginatedGamesResponse> {
+  async getGames(filter: GameFilter = {}): Promise<PaginatedGamesResponse | Game[]> {
     const params = new URLSearchParams();
 
     if (filter.page !== undefined && filter.page > 0) {
@@ -36,7 +36,7 @@ export const gamesService = {
     const queryString = params.toString();
     const endpoint = queryString ? `/games?${queryString}` : '/games';
 
-    return httpClient.get<PaginatedGamesResponse>(endpoint);
+    return httpClient.get<PaginatedGamesResponse | Game[]>(endpoint);
   },
 
   /**

@@ -23,10 +23,24 @@ export function useGenres(): UseGenresResult {
 
     try {
       const data = await gamesService.getGenres();
-      setGenres(Array.isArray(data) ? data : []);
+      if (Array.isArray(data)) {
+        setGenres(data);
+      } else if (data && typeof data === 'object' && Array.isArray((data as { data?: Genre[] }).data)) {
+        setGenres((data as { data: Genre[] }).data);
+      } else {
+        setGenres([]);
+      }
     } catch (err: unknown) {
       if (err instanceof HttpClientError) {
-        setError(err.message || 'No se pudieron cargar los géneros');
+        if (err.statusCode === 404) {
+          setError(
+            err.message === 'Ruta no encontrada'
+              ? 'El endpoint de géneros (/api/genres) aún no está disponible en el backend (HTTP 404).'
+              : err.message
+          );
+        } else {
+          setError(err.message || 'No se pudieron cargar los géneros');
+        }
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
