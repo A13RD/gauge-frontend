@@ -28,8 +28,15 @@ export function AdminGameModal({
   const [description, setDescription] = useState('');
   const [releaseDate, setReleaseDate] = useState('');
   const [genreId, setGenreId] = useState('');
+  const [trailerUrl, setTrailerUrl] = useState('');
+
+  // Portada (Cover 3:4)
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Imagen Panorámica / Hero (Banner 16:9)
+  const [selectedBannerFile, setSelectedBannerFile] = useState<File | null>(null);
+  const [bannerPreviewUrl, setBannerPreviewUrl] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -40,6 +47,7 @@ export function AdminGameModal({
       setTitle(gameToEdit.title || '');
       setDescription(gameToEdit.description || '');
       setGenreId(gameToEdit.genreId || gameToEdit.genre?.id || '');
+      setTrailerUrl(gameToEdit.trailerUrl || '');
       if (gameToEdit.releaseDate) {
         const d = new Date(gameToEdit.releaseDate);
         if (!isNaN(d.getTime())) {
@@ -51,14 +59,19 @@ export function AdminGameModal({
         setReleaseDate('');
       }
       setPreviewUrl(gameToEdit.coverUrl || null);
+      setBannerPreviewUrl(gameToEdit.bannerUrl || null);
       setSelectedFile(null);
+      setSelectedBannerFile(null);
     } else {
       setTitle('');
       setDescription('');
       setReleaseDate(new Date().toISOString().split('T')[0]);
       setGenreId(genres.length > 0 ? genres[0].id : '');
+      setTrailerUrl('');
       setSelectedFile(null);
+      setSelectedBannerFile(null);
       setPreviewUrl(null);
+      setBannerPreviewUrl(null);
     }
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -79,6 +92,23 @@ export function AdminGameModal({
       }
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
+      setErrorMessage(null);
+    }
+  };
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
+        setErrorMessage('Solo se admiten imágenes en formato PNG, JPEG o WebP para el banner.');
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        setErrorMessage('El tamaño del banner no debe superar los 8 MB.');
+        return;
+      }
+      setSelectedBannerFile(file);
+      setBannerPreviewUrl(URL.createObjectURL(file));
       setErrorMessage(null);
     }
   };
@@ -117,8 +147,16 @@ export function AdminGameModal({
       formData.append('releaseDate', releaseDate);
       formData.append('genreId', genreId);
 
+      if (trailerUrl && trailerUrl.trim()) {
+        formData.append('trailerUrl', trailerUrl.trim());
+      }
+
       if (selectedFile) {
         formData.append('image', selectedFile);
+      }
+
+      if (selectedBannerFile) {
+        formData.append('banner', selectedBannerFile);
       }
 
       if (isEditing && gameToEdit) {
@@ -254,12 +292,12 @@ export function AdminGameModal({
           {/* Subida binaria de carátula */}
           <div>
             <label className="block text-xs font-mono font-bold uppercase tracking-wider text-charcoal-text dark:text-pure-white mb-1.5">
-              Carátula Oficial {isEditing ? '(Opcional para actualizar)' : '*'}
+              1. Carátula Oficial (3:4) {isEditing ? '(Opcional para actualizar)' : '*'}
             </label>
             <div className="flex items-center gap-4">
               <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-frost-steel dark:border-steam-steel/60 hover:border-sky-accent dark:hover:border-steam-blue bg-frost-bg/50 dark:bg-steam-dark/40 cursor-pointer transition-colors text-xs text-active-slate dark:text-steam-light font-medium">
                 <Upload className="w-4 h-4 text-sky-accent dark:text-steam-blue" aria-hidden="true" />
-                <span>{selectedFile ? selectedFile.name : 'Seleccionar archivo de imagen (PNG, JPEG, WebP)'}</span>
+                <span>{selectedFile ? selectedFile.name : 'Seleccionar carátula (PNG, JPEG, WebP)'}</span>
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
@@ -270,14 +308,62 @@ export function AdminGameModal({
               </label>
 
               {previewUrl && (
-                <div className="w-14 h-14 rounded-xl overflow-hidden border border-frost-steel dark:border-steam-steel shrink-0 bg-frost-bg">
+                <div className="w-14 h-16 rounded-xl overflow-hidden border border-frost-steel dark:border-steam-steel shrink-0 bg-frost-bg shadow-sm">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <img src={previewUrl} alt="Preview carátula" className="w-full h-full object-cover" />
                 </div>
               )}
             </div>
             <p className="text-[11px] text-active-slate/70 dark:text-steam-light/60 mt-1 font-mono">
-              La imagen se enviará mediante multipart/form-data a Supabase Storage.
+              Utilizada en tarjetas de catálogo y listados generales.
+            </p>
+          </div>
+
+          {/* Subida binaria de imagen panorámica / Hero de detalle */}
+          <div>
+            <label className="block text-xs font-mono font-bold uppercase tracking-wider text-charcoal-text dark:text-pure-white mb-1.5">
+              2. Imagen Panorámica / Hero (16:9) (Opcional)
+            </label>
+            <div className="flex items-center gap-4">
+              <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-frost-steel dark:border-steam-steel/60 hover:border-sky-accent dark:hover:border-steam-blue bg-frost-bg/50 dark:bg-steam-dark/40 cursor-pointer transition-colors text-xs text-active-slate dark:text-steam-light font-medium">
+                <Upload className="w-4 h-4 text-sky-accent dark:text-steam-blue" aria-hidden="true" />
+                <span>{selectedBannerFile ? selectedBannerFile.name : 'Seleccionar imagen panorámica de fondo'}</span>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleBannerChange}
+                  disabled={isSubmitting}
+                  className="hidden"
+                />
+              </label>
+
+              {bannerPreviewUrl && (
+                <div className="w-24 h-14 rounded-xl overflow-hidden border border-frost-steel dark:border-steam-steel shrink-0 bg-frost-bg shadow-sm">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={bannerPreviewUrl} alt="Preview banner" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-active-slate/70 dark:text-steam-light/60 mt-1 font-mono">
+              Fondo panorámico inmersivo de la ficha de detalle (estilo Spider-Man).
+            </p>
+          </div>
+
+          {/* URL de Tráiler Oficial */}
+          <div>
+            <label className="block text-xs font-mono font-bold uppercase tracking-wider text-charcoal-text dark:text-pure-white mb-1.5">
+              3. URL Tráiler Oficial de YouTube (Opcional)
+            </label>
+            <input
+              type="url"
+              value={trailerUrl}
+              onChange={(e) => setTrailerUrl(e.target.value)}
+              disabled={isSubmitting}
+              placeholder="Ej. https://www.youtube.com/watch?v=..."
+              className="w-full px-4 py-2.5 rounded-xl bg-frost-bg dark:bg-steam-dark/80 border border-frost-steel dark:border-steam-steel text-sm text-charcoal-text dark:text-pure-white focus:outline-none focus:border-sky-accent dark:focus:border-steam-blue transition-all font-mono text-xs"
+            />
+            <p className="text-[11px] text-active-slate/70 dark:text-steam-light/60 mt-1 font-mono">
+              Permitirá reproducir el tráiler en HD directamente en la ficha del juego.
             </p>
           </div>
 

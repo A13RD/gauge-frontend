@@ -24,6 +24,7 @@ export interface Game {
   description: string;
   coverUrl: string;
   bannerUrl?: string | null;
+  trailerUrl?: string | null;
   releaseDate?: string;
   genreId?: string;
   genre?: Genre;

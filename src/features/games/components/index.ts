@@ -5,5 +5,8 @@ export * from './GameFilters';
 export * from './GameGrid';
 export * from './Pagination';
 export * from './AdminGameModal';
+export * from './GameTrailerCard';
+export * from './GameReviewScoreCard';
+
 
 
