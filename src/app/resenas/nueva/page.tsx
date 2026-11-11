@@ -2,20 +2,24 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AppShell } from '@/features/common/components/AppShell';
 import { Button } from '@/features/common/components/Button';
 import { ProtectedRoute } from '@/features/auth';
 import { useGames } from '@/features/games/hooks/useGames';
+import { reviewsService } from '@/features/reviews';
+import { HttpClientError } from '@/features/common/http';
 import {
   SquarePen,
   Clock,
   Gamepad2,
-  Info,
   ChevronLeft,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
 
 function NuevaResenaContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialGameId = searchParams.get('gameId') || '';
 
@@ -25,12 +29,63 @@ function NuevaResenaContent() {
   const [rating, setRating] = useState<number>(9);
   const [hours, setHours] = useState<string>('15');
   const [content, setContent] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialGameId) {
       setSelectedGameId(initialGameId);
     }
   }, [initialGameId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    // Validaciones en cliente
+    if (!selectedGameId || selectedGameId.trim() === '') {
+      setErrorMessage('Debes seleccionar un videojuego del catálogo a evaluar.');
+      return;
+    }
+
+    const numHours = Number(hours);
+    if (isNaN(numHours) || numHours < 0) {
+      setErrorMessage('Las horas de gameplay deben ser un número mayor o igual a 0.');
+      return;
+    }
+
+    if (!content || content.trim().length < 5) {
+      setErrorMessage('El análisis técnico debe contener al menos 5 caracteres.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await reviewsService.createReview({
+        gameId: selectedGameId.trim(),
+        rating,
+        content: content.trim(),
+        hoursPlayed: Math.floor(numHours),
+      });
+
+      setSuccessMessage('¡Tu reseña ha sido publicada exitosamente en la comunidad!');
+      setTimeout(() => {
+        router.push('/mis-reseñas');
+      }, 1500);
+    } catch (err: unknown) {
+      if (err instanceof HttpClientError) {
+        setErrorMessage(err.message);
+      } else if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage('Error al enviar la reseña al servidor.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto w-full py-4 sm:py-6 space-y-6">
@@ -54,8 +109,26 @@ function NuevaResenaContent() {
         </div>
       </div>
 
+      {/* Alertas de Éxito o Error */}
+      {successMessage && (
+        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm flex items-center gap-3 animate-fade-in shadow-md">
+          <CheckCircle2 className="w-5 h-5 shrink-0" aria-hidden="true" />
+          <div className="font-medium">{successMessage} Redirigiendo a tu historial...</div>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-sm flex items-center gap-3 animate-fade-in shadow-md">
+          <AlertTriangle className="w-5 h-5 shrink-0" aria-hidden="true" />
+          <div className="font-medium">{errorMessage}</div>
+        </div>
+      )}
+
       {/* Tarjeta Glassmorphic del Formulario */}
-      <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-frost-steel dark:border-steam-steel/50 shadow-2xl space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="glass-panel rounded-3xl p-6 sm:p-8 border border-frost-steel dark:border-steam-steel/50 shadow-2xl space-y-6"
+      >
         {/* 1. Selector de Videojuego */}
         <div className="space-y-2">
           <label
@@ -69,7 +142,8 @@ function NuevaResenaContent() {
               id="game-select"
               value={selectedGameId}
               onChange={(e) => setSelectedGameId(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-steam-dark/80 border border-frost-steel dark:border-steam-steel text-sm text-charcoal-text dark:text-pure-white focus-visible:outline-none focus-visible:border-sky-accent dark:focus-visible:border-steam-blue focus-visible:ring-1 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue transition-all"
+              disabled={isSubmitting}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-steam-dark/80 border border-frost-steel dark:border-steam-steel text-sm text-charcoal-text dark:text-pure-white focus-visible:outline-none focus-visible:border-sky-accent dark:focus-visible:border-steam-blue focus-visible:ring-1 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue transition-all disabled:opacity-60"
             >
               <option value="" disabled>
                 {isLoadingGames ? 'Cargando videojuegos...' : 'Selecciona un videojuego del catálogo...'}
@@ -108,6 +182,7 @@ function NuevaResenaContent() {
                 <button
                   key={num}
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => setRating(num)}
                   className={`py-2 rounded-xl font-mono font-bold text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue ${
                     isSelected
@@ -138,8 +213,9 @@ function NuevaResenaContent() {
               step="1"
               value={hours}
               onChange={(e) => setHours(e.target.value)}
+              disabled={isSubmitting}
               placeholder="Ej. 24"
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-steam-dark/80 border border-frost-steel dark:border-steam-steel text-sm text-charcoal-text dark:text-pure-white placeholder-active-slate/50 dark:placeholder-steam-light/50 focus-visible:outline-none focus-visible:border-sky-accent dark:focus-visible:border-steam-blue focus-visible:ring-1 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue transition-all"
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-steam-dark/80 border border-frost-steel dark:border-steam-steel text-sm text-charcoal-text dark:text-pure-white placeholder-active-slate/50 dark:placeholder-steam-light/50 focus-visible:outline-none focus-visible:border-sky-accent dark:focus-visible:border-steam-blue focus-visible:ring-1 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue transition-all disabled:opacity-60"
             />
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-active-slate/60 dark:text-steam-light/60">
               <Clock className="w-4 h-4" aria-hidden="true" />
@@ -160,7 +236,7 @@ function NuevaResenaContent() {
               4. Análisis de Jugabilidad y Experiencia
             </label>
             <span className="text-[11px] text-active-slate/60 dark:text-steam-light/60 font-mono">
-              {content.length} caracteres
+              {content.length} caracteres (mín. 5)
             </span>
           </div>
           <textarea
@@ -168,37 +244,30 @@ function NuevaResenaContent() {
             rows={5}
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            disabled={isSubmitting}
             placeholder="Describe tu experiencia técnica: rendimiento, diseño de niveles, atmósfera sonora, dificultad y balance..."
-            className="w-full p-4 rounded-xl bg-white dark:bg-steam-dark/80 border border-frost-steel dark:border-steam-steel text-sm text-charcoal-text dark:text-pure-white placeholder-active-slate/50 dark:placeholder-steam-light/50 focus-visible:outline-none focus-visible:border-sky-accent dark:focus-visible:border-steam-blue focus-visible:ring-1 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue transition-all resize-y"
+            className="w-full p-4 rounded-xl bg-white dark:bg-steam-dark/80 border border-frost-steel dark:border-steam-steel text-sm text-charcoal-text dark:text-pure-white placeholder-active-slate/50 dark:placeholder-steam-light/50 focus-visible:outline-none focus-visible:border-sky-accent dark:focus-visible:border-steam-blue focus-visible:ring-1 focus-visible:ring-sky-accent dark:focus-visible:ring-steam-blue transition-all resize-y disabled:opacity-60"
           />
-        </div>
-
-        {/* Aviso informativo de contrato */}
-        <div className="p-4 rounded-2xl bg-frost-bg dark:bg-steam-steel/20 border border-frost-steel dark:border-steam-steel/40 flex items-start gap-3">
-          <Info className="w-5 h-5 text-sky-accent dark:text-steam-blue shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="text-xs text-active-slate dark:text-steam-light leading-relaxed">
-            <strong>Nota de integración:</strong> Este formulario refleja los parámetros exigidos
-            por el contrato de API (`POST /api/reviews`). El envío hacia el servidor se activará
-            en la siguiente etapa de desarrollo tras enlazar la sesión de usuario (Etapa 3).
-          </div>
         </div>
 
         {/* Botones de acción */}
         <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-frost-steel/60 dark:border-steam-steel/30">
           <Link href="/catalogo">
-            <Button variant="outline" size="md">
+            <Button variant="outline" size="md" disabled={isSubmitting}>
               Cancelar
             </Button>
           </Link>
           <Button
+            type="submit"
             variant="primary"
             size="md"
+            isLoading={isSubmitting}
             leftIcon={<SquarePen className="w-4 h-4" />}
           >
             Publicar Reseña
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

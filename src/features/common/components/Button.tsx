@@ -3,7 +3,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -40,6 +40,8 @@ export function Button({
       'bg-transparent text-active-slate border border-frost-steel hover:border-sky-accent hover:text-sky-accent dark:text-steam-light dark:border-steam-steel dark:hover:border-steam-blue dark:hover:text-steam-blue transition-all',
     ghost:
       'bg-transparent text-active-slate hover:bg-frost-steel/40 hover:text-charcoal-text dark:text-steam-light dark:hover:bg-steam-navy/60 dark:hover:text-white transition-all',
+    danger:
+      'bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-600/90 dark:text-white dark:hover:bg-rose-600 shadow-sm border border-transparent transition-all',
   };
 
   const isDisabled = disabled || isLoading;

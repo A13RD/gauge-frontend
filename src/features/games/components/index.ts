@@ -4,4 +4,6 @@ export * from './NewGamesCarousel';
 export * from './GameFilters';
 export * from './GameGrid';
 export * from './Pagination';
+export * from './AdminGameModal';
+
 

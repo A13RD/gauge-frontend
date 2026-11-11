@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from './Button';
 import { useAuth } from '@/features/auth';
+import { useUserStats } from '@/features/users';
 
 export interface RightDockProps {
   children?: React.ReactNode;
@@ -22,6 +23,12 @@ export function RightDock({
   className = '',
 }: RightDockProps) {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { stats, isLoading: isLoadingStats } = useUserStats();
+
+  const totalHours = stats?.totalHours ?? 0;
+  const totalReviews = stats?.totalReviews ?? 0;
+  const topGenres = stats?.hoursByGenre ? stats.hoursByGenre.slice(0, 3) : [];
+  const strokeOffset = Math.max(0, 251.2 - Math.min(1, totalHours / 100) * 251.2);
   return (
     <aside
       aria-label="Panel lateral complementario"
@@ -147,7 +154,7 @@ export function RightDock({
                     className="text-frost-steel/40 dark:text-steam-steel/40"
                     fill="transparent"
                   />
-                  {/* Segmento Survival Horror / Acción */}
+                  {/* Segmento dinámico de horas */}
                   <circle
                     cx="50"
                     cy="50"
@@ -155,7 +162,7 @@ export function RightDock({
                     stroke="currentColor"
                     strokeWidth="10"
                     strokeDasharray="251.2"
-                    strokeDashoffset="100"
+                    strokeDashoffset={strokeOffset}
                     strokeLinecap="round"
                     className="text-sky-accent dark:text-steam-blue transition-all duration-1000"
                     fill="transparent"
@@ -163,40 +170,50 @@ export function RightDock({
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span className="text-lg font-black font-mono text-charcoal-text dark:text-pure-white">
-                    0h
+                    {isLoadingStats ? '...' : `${totalHours}h`}
                   </span>
                   <span className="text-[9px] uppercase tracking-wider text-active-slate/70 dark:text-steam-light/60 font-semibold">
-                    Registradas
+                    {isAuthenticated ? `${totalReviews} Reseñas` : 'Registradas'}
                   </span>
                 </div>
               </div>
 
-              {/* Barras de distribución por género */}
-              <div className="flex flex-col gap-2 pt-1 border-t border-frost-steel/60 dark:border-steam-steel/30 text-xs">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[11px] text-active-slate dark:text-steam-light">
-                    <span>Survival Horror</span>
-                    <span className="font-mono text-charcoal-text dark:text-pure-white">-- %</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-frost-steel/40 dark:bg-steam-steel/40 rounded-full overflow-hidden">
-                    <div className="h-full bg-sky-accent dark:bg-steam-blue rounded-full w-0" />
-                  </div>
+              {/* Barras dinámicas de distribución por género */}
+              {isAuthenticated && topGenres.length > 0 ? (
+                <div className="flex flex-col gap-2 pt-1 border-t border-frost-steel/60 dark:border-steam-steel/30 text-xs">
+                  {topGenres.map((g, idx) => {
+                    const percent = totalHours > 0 ? Math.round((g.hours / totalHours) * 100) : 0;
+                    const barColor =
+                      idx === 0
+                        ? 'bg-sky-accent dark:bg-steam-blue'
+                        : idx === 1
+                        ? 'bg-emerald-500'
+                        : 'bg-purple-500';
+                    return (
+                      <div key={g.genre} className="space-y-1">
+                        <div className="flex justify-between text-[11px] text-active-slate dark:text-steam-light">
+                          <span className="truncate max-w-[130px] font-medium">{g.genre}</span>
+                          <span className="font-mono text-charcoal-text dark:text-pure-white">
+                            {g.hours}h ({percent}%)
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-frost-steel/40 dark:bg-steam-steel/40 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${barColor} rounded-full transition-all duration-500`}
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[11px] text-active-slate dark:text-steam-light">
-                    <span>Acción / FPS</span>
-                    <span className="font-mono text-charcoal-text dark:text-pure-white">-- %</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-frost-steel/40 dark:bg-steam-steel/40 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full w-0" />
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-[11px] text-active-slate/70 dark:text-steam-light/70 leading-relaxed text-center pt-2">
-                Conecta tu cuenta para sincronizar tus horas de gameplay y desbloquear tu gráfico analítico.
-              </p>
+              ) : (
+                <p className="text-[11px] text-active-slate/70 dark:text-steam-light/70 leading-relaxed text-center pt-2">
+                  {isAuthenticated
+                    ? 'Aún no has registrado horas. Publica una reseña para calcular tu distribución de géneros.'
+                    : 'Conecta tu cuenta para sincronizar tus horas de gameplay y desbloquear tu gráfico analítico.'}
+                </p>
+              )}
             </div>
           </div>
         )}

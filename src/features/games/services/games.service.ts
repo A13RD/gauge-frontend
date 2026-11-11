@@ -57,5 +57,44 @@ export const gamesService = {
   async getGenres(): Promise<Genre[]> {
     return httpClient.get<Genre[]>('/genres');
   },
-};
 
+  /**
+   * Crea un nuevo videojuego con carga de imagen (POST /api/games)
+   * Requiere rol ADMIN y body como FormData con campo 'image'
+   */
+  async createGame(formData: FormData): Promise<Game> {
+    return httpClient.post<Game>('/games', formData);
+  },
+
+  /**
+   * Actualiza los datos o carátula de un videojuego existente (PUT /api/games/:id)
+   * Requiere rol ADMIN
+   */
+  async updateGame(id: string, formData: FormData | Record<string, unknown>): Promise<Game> {
+    return httpClient.put<Game>(`/games/${encodeURIComponent(id)}`, formData);
+  },
+
+  /**
+   * Elimina lógicamente un videojuego (DELETE /api/games/:id)
+   * Requiere rol ADMIN
+   */
+  async deleteGame(id: string): Promise<{ message: string }> {
+    return httpClient.delete<{ message: string }>(`/games/${encodeURIComponent(id)}`);
+  },
+
+  /**
+   * Crea un nuevo género (POST /api/genres)
+   * Requiere rol ADMIN
+   */
+  async createGenre(data: { name: string; slug?: string }): Promise<Genre> {
+    return httpClient.post<Genre>('/genres', data);
+  },
+
+  /**
+   * Elimina un género no vinculado (DELETE /api/genres/:id)
+   * Requiere rol ADMIN
+   */
+  async deleteGenre(id: string): Promise<{ message: string }> {
+    return httpClient.delete<{ message: string }>(`/genres/${encodeURIComponent(id)}`);
+  },
+};
