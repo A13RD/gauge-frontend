@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import './globals.css';
+import type { Metadata } from 'next';
 import { ThemeProvider } from '@/features/common/hooks/useTheme';
 import { AuthProvider } from '@/features/auth';
 
