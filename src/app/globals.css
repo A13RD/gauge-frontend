@@ -220,6 +220,8 @@ html.light {
 
 /* ==========================================================================
    Fondo Ambiental Responsive de GAUGE (Pixel Art Gothic Castle)
+   - Modo Oscuro: Noche con Luna Llena (gauge-bg-desktop.jpg / gauge-bg-mobile.jpg)
+   - Modo Claro: Día Soleado sobre las Nubes (gauge-bg-desktop-light.jpg / gauge-bg-mobile-light.jpg)
    ========================================================================== */
 
 .gauge-ambient-bg {
@@ -241,30 +243,35 @@ html.light {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center bottom;
-  /* Móvil por defecto (Mobile-first para resoluciones < 768px) */
-  background-image: url('/images/backgrounds/gauge-bg-mobile.jpg');
-  opacity: 0.22; /* Rango especificado: 0.18 a 0.28 */
   transform: translateZ(0);
-  will-change: opacity;
+  will-change: opacity, background-image;
   transition: opacity 0.3s ease;
 }
 
-/* Escritorio y pantallas grandes (>= 768px): fondo panorámico */
+/* --- MODO OSCURO (Predeterminado) --- */
+.gauge-ambient-img,
+html.dark .gauge-ambient-img {
+  /* Móvil por defecto (< 768px) */
+  background-image: url('/images/backgrounds/gauge-bg-mobile.jpg');
+  opacity: 0.22;
+}
+
 @media (min-width: 768px) {
-  .gauge-ambient-img {
+  .gauge-ambient-img,
+  html.dark .gauge-ambient-img {
+    /* Pantallas grandes y escritorio (>= 768px) */
     background-image: url('/images/backgrounds/gauge-bg-desktop.jpg');
     background-position: center bottom;
   }
 }
 
-/* Capa de overlay para contraste y atmósfera visual */
 .gauge-ambient-overlay {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  /* Dark mode: degradado radial oscuro que preserva la luna y viñetea los bordes */
+  /* Overlay nocturno profundo que preserva la luna e intensifica el contraste */
   background: radial-gradient(
     ellipse at 50% 30%,
     rgba(27, 40, 56, 0.45) 0%,
@@ -273,12 +280,27 @@ html.light {
   transition: background 0.3s ease;
 }
 
-/* Compatibilidad con Light Mode (Clean Frost Arcade) */
+/* --- MODO CLARO (Clean Frost Arcade con Castillo Diurno) --- */
 html.light .gauge-ambient-img {
-  opacity: 0.08; /* Sutil para preservar contraste con textos oscuros */
+  /* Móvil por defecto (< 768px) */
+  background-image: url('/images/backgrounds/gauge-bg-mobile-light.jpg');
+  opacity: 0.32;
+}
+
+@media (min-width: 768px) {
+  html.light .gauge-ambient-img {
+    /* Pantallas grandes y escritorio (>= 768px) */
+    background-image: url('/images/backgrounds/gauge-bg-desktop-light.jpg');
+    background-position: center bottom;
+  }
 }
 
 html.light .gauge-ambient-overlay {
-  background: rgba(240, 244, 248, 0.88); /* Overlay frost de alta claridad */
+  /* Overlay diurno que resalta el sol y los rayos celestes manteniendo nitidez */
+  background: radial-gradient(
+    ellipse at 50% 25%,
+    rgba(240, 244, 248, 0.35) 0%,
+    rgba(240, 244, 248, 0.70) 100%
+  );
 }
 
