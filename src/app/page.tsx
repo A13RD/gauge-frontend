@@ -17,12 +17,14 @@ import { useGames } from '@/features/games/hooks/useGames';
 import { HeroValorantCard } from '@/features/games/components/HeroValorantCard';
 import { NewGamesCarousel } from '@/features/games/components/NewGamesCarousel';
 import { getGameRating } from '@/features/games/domain/game.types';
+import { useUserStats } from '@/features/users';
 
 export default function HomePage() {
   const { games, isLoading, error, refetch } = useGames({
     limit: 10,
     sort: 'recent',
   });
+  const { stats } = useUserStats();
 
   // Identificar si algún juego cargado incluye reseñas reales para la sección de comunidad
   const gamesWithReviews = games.filter(
@@ -35,6 +37,11 @@ export default function HomePage() {
       gameId: g.id,
     }))
   );
+  const communityTotalHours = communityReviews.reduce(
+    (acc, rev) => acc + (rev.hoursPlayed || 0),
+    0
+  );
+  const displayedHours = stats?.totalHours ? stats.totalHours : communityTotalHours;
 
   // Seleccionar un juego destacado secundario para la recomendación ancha
   const recommendedGame = games.length > 1 ? games[1] : games[0];
@@ -44,25 +51,25 @@ export default function HomePage() {
     <AppShell>
       <div className="flex flex-col gap-6 sm:gap-8">
         {/* QUICK STATS CARD: Específico de Móvil (según boceto oficial BocetoPaginaResponsive.jpg) */}
-        <div className="lg:hidden glass-panel rounded-2xl p-4 border border-frost-steel dark:border-steam-steel/50 shadow-md">
+        <div className="lg:hidden glass-panel rounded-2xl p-3.5 sm:p-4 border border-frost-steel dark:border-steam-steel/50 shadow-md">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider font-mono text-active-slate/80 dark:text-steam-light/70">
               Quick Stats
             </span>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-accent/15 dark:bg-steam-blue/20 text-sky-accent dark:text-steam-blue font-mono font-medium">
-              Comunidad
+              {stats?.totalHours ? 'Personal' : 'Comunidad'}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white dark:bg-steam-dark/60 border border-frost-steel dark:border-steam-steel/40">
-              <Clock className="w-4 h-4 text-sky-accent dark:text-steam-blue" aria-hidden="true" />
-              <span className="text-xs font-mono font-bold text-charcoal-text dark:text-pure-white">
-                0h registradas
+          <div className="grid grid-cols-2 gap-2">
+            <div className="min-w-0 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-white dark:bg-steam-dark/60 border border-frost-steel dark:border-steam-steel/40">
+              <Clock className="w-4 h-4 text-sky-accent dark:text-steam-blue shrink-0" aria-hidden="true" />
+              <span className="text-xs font-mono font-bold text-charcoal-text dark:text-pure-white truncate">
+                {isLoading ? '...' : `${displayedHours}h registradas`}
               </span>
             </div>
-            <div className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white dark:bg-steam-dark/60 border border-frost-steel dark:border-steam-steel/40">
-              <Star className="w-4 h-4 text-amber-500" aria-hidden="true" />
-              <span className="text-xs font-mono font-bold text-charcoal-text dark:text-pure-white">
+            <div className="min-w-0 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-white dark:bg-steam-dark/60 border border-frost-steel dark:border-steam-steel/40">
+              <Star className="w-4 h-4 text-amber-500 shrink-0" aria-hidden="true" />
+              <span className="text-xs font-mono font-bold text-charcoal-text dark:text-pure-white truncate">
                 {isLoading ? '...' : `${games.length} Títulos`}
               </span>
             </div>

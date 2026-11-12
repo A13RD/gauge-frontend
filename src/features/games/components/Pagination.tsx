@@ -70,11 +70,13 @@ export function Pagination({
       aria-label="Paginación del catálogo"
       className={`flex flex-col sm:flex-row items-center justify-between gap-4 py-4 pt-6 border-t border-frost-steel/60 dark:border-steam-steel/30 ${className}`}
     >
-      {/* Resumen de cantidad */}
+      {/* Resumen de cantidad y página actual */}
       <span className="text-xs font-mono text-active-slate/80 dark:text-steam-light/70">
         Mostrando <strong className="text-charcoal-text dark:text-pure-white">{startItem}</strong> -{' '}
         <strong className="text-charcoal-text dark:text-pure-white">{endItem}</strong> de{' '}
-        <strong className="text-charcoal-text dark:text-pure-white">{total}</strong> videojuegos
+        <strong className="text-charcoal-text dark:text-pure-white">{total}</strong> videojuegos ·{' '}
+        Página <strong className="text-sky-accent dark:text-steam-blue">{currentPage}</strong> de{' '}
+        <strong className="text-charcoal-text dark:text-pure-white">{totalPages}</strong>
       </span>
 
       {/* Botones de navegación */}

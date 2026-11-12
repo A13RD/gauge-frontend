@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppShell } from '@/features/common/components/AppShell';
 import { AdminRoute, useAuth, authService } from '@/features/auth';
 import { Button } from '@/features/common/components/Button';
@@ -10,6 +10,8 @@ import {
   gamesService,
   Game,
   AdminGameModal,
+  GameFilters,
+  Pagination,
 } from '@/features/games';
 import { HttpClientError } from '@/features/common/http';
 import {
@@ -32,14 +34,23 @@ import {
 function AdminContent() {
   const { user } = useAuth();
 
-  // Gestión de videojuegos
+  // Estado local para búsqueda reactiva en el catálogo administrativo
+  const [searchInput, setSearchInput] = useState('');
+
+  // Gestión de videojuegos con paginación administrativa (máximo 5 por página)
   const {
     games,
     pagination,
     isLoading: isLoadingGames,
     error: gamesError,
+    filter,
+    setFilter,
     refetch: refetchGames,
-  } = useGames({ limit: 50 });
+  } = useGames({
+    page: 1,
+    limit: 5,
+    sort: 'recent',
+  });
 
   // Gestión de géneros
   const {
@@ -48,6 +59,64 @@ function AdminContent() {
     error: genresError,
     refetch: refetchGenres,
   } = useGenres();
+
+  // Aplicar búsqueda con debounce y reiniciar siempre a página 1
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentSearch = filter.search || '';
+      if (searchInput !== currentSearch) {
+        setFilter((prev) => ({
+          ...prev,
+          search: searchInput,
+          page: 1,
+          limit: 5,
+        }));
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchInput, filter.search, setFilter]);
+
+  const handleGenreChange = (newGenre?: string) => {
+    setFilter((prev) => ({
+      ...prev,
+      genre: newGenre || '',
+      page: 1,
+      limit: 5,
+    }));
+  };
+
+  const handleSortChange = (newSort: 'recent' | 'popular') => {
+    setFilter((prev) => ({
+      ...prev,
+      sort: newSort,
+      page: 1,
+      limit: 5,
+    }));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setFilter((prev) => ({
+      ...prev,
+      page: newPage,
+      limit: 5,
+    }));
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput('');
+    setFilter({
+      search: '',
+      genre: '',
+      sort: 'recent',
+      page: 1,
+      limit: 5,
+    });
+  };
+
+  const isFiltered = Boolean(
+    filter.search || filter.genre || (filter.sort && filter.sort !== 'recent')
+  );
 
   // Estados de Modal y Edición de Juegos
   const [isGameModalOpen, setIsGameModalOpen] = useState(false);
@@ -123,7 +192,15 @@ function AdminContent() {
         message: `El videojuego "${gameToDelete.title}" fue eliminado correctamente.`,
       });
       setGameToDelete(null);
-      await refetchGames();
+      if (games.length === 1 && (filter.page || 1) > 1) {
+        setFilter((prev) => ({
+          ...prev,
+          page: Math.max(1, (prev.page || 2) - 1),
+          limit: 5,
+        }));
+      } else {
+        await refetchGames();
+      }
     } catch (err: unknown) {
       if (err instanceof HttpClientError) {
         setGameActionFeedback({ type: 'error', message: err.message });
@@ -300,7 +377,7 @@ function AdminContent() {
 
       {/* SECCIÓN 1: GESTIÓN DE VIDEOJUEGOS */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-sky-accent/15 dark:bg-steam-blue/15 text-sky-accent dark:text-steam-blue border border-sky-accent/30">
               <Gamepad2 className="w-5 h-5" aria-hidden="true" />
@@ -310,20 +387,52 @@ function AdminContent() {
                 Catálogo de Videojuegos
               </h2>
               <p className="text-xs text-active-slate dark:text-steam-light">
-                {pagination ? `${pagination.total} videojuegos registrados` : 'Cargando listado...'}
+                {pagination
+                  ? `${pagination.total} ${
+                      pagination.total === 1 ? 'videojuego' : 'videojuegos'
+                    } ${isFiltered ? 'encontrados' : 'registrados'} · Página ${
+                      pagination.currentPage
+                    } de ${Math.max(1, pagination.totalPages)} (máx. 5 por página)`
+                  : 'Cargando listado...'}
               </p>
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetchGames()}
-            isLoading={isLoadingGames}
-            leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-          >
-            Actualizar
-          </Button>
+          <div className="flex items-center gap-2">
+            {isFiltered && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleClearFilters}
+                leftIcon={<X className="w-3.5 h-3.5" />}
+              >
+                Limpiar filtros
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetchGames()}
+              isLoading={isLoadingGames}
+              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+            >
+              Actualizar
+            </Button>
+          </div>
+        </div>
+
+        {/* Barra de Búsqueda y Filtros reutilizada del catálogo público */}
+        <div className="glass-panel rounded-2xl p-4 sm:p-5 border border-frost-steel dark:border-steam-steel/40 shadow-md">
+          <GameFilters
+            search={searchInput}
+            onSearchChange={setSearchInput}
+            selectedGenre={filter.genre}
+            onGenreChange={handleGenreChange}
+            selectedSort={filter.sort}
+            onSortChange={handleSortChange}
+            genres={genres}
+            isLoadingGenres={isLoadingGenres}
+          />
         </div>
 
         {/* Feedback de acciones sobre videojuegos */}
@@ -402,117 +511,143 @@ function AdminContent() {
           <div className="glass-panel rounded-3xl p-10 border border-frost-steel dark:border-steam-steel/50 text-center space-y-3">
             <Gamepad2 className="w-10 h-10 mx-auto text-active-slate/40 dark:text-steam-light/30" />
             <h3 className="font-bold text-sm text-charcoal-text dark:text-pure-white">
-              No hay videojuegos registrados
+              {isFiltered
+                ? 'Sin resultados para esta búsqueda o filtro'
+                : 'No hay videojuegos registrados'}
             </h3>
             <p className="text-xs text-active-slate dark:text-steam-light max-w-sm mx-auto">
-              Comienza registrando un videojuego con su título, descripción, género y carátula oficial.
+              {isFiltered
+                ? 'No se encontraron videojuegos que coincidan con los criterios actuales. Prueba con otro término o limpia los filtros activos.'
+                : 'Comienza registrando un videojuego con su título, descripción, género y carátula oficial.'}
             </p>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleOpenCreateGame}
-              leftIcon={<Plus className="w-3.5 h-3.5" />}
-            >
-              Crear Primer Videojuego
-            </Button>
+            {isFiltered ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleClearFilters}
+                leftIcon={<X className="w-3.5 h-3.5" />}
+              >
+                Restablecer búsqueda y filtros
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleOpenCreateGame}
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
+              >
+                Crear Primer Videojuego
+              </Button>
+            )}
           </div>
         ) : (
-          <div className="glass-panel rounded-3xl border border-frost-steel dark:border-steam-steel/50 overflow-hidden shadow-xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-frost-steel dark:border-steam-steel/30 bg-frost-bg/50 dark:bg-steam-steel/20 text-[11px] font-mono uppercase tracking-wider text-active-slate dark:text-steam-light">
-                    <th className="py-3.5 px-4 font-bold">Carátula</th>
-                    <th className="py-3.5 px-4 font-bold">Título</th>
-                    <th className="py-3.5 px-4 font-bold">Género</th>
-                    <th className="py-3.5 px-4 font-bold">Lanzamiento</th>
-                    <th className="py-3.5 px-4 font-bold">Valoración</th>
-                    <th className="py-3.5 px-4 font-bold text-right">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-frost-steel/60 dark:divide-steam-steel/20 text-xs">
-                  {games.map((game) => (
-                    <tr
-                      key={game.id}
-                      className="hover:bg-frost-bg/40 dark:hover:bg-steam-steel/10 transition-colors"
-                    >
-                      <td className="py-3 px-4">
-                        <div className="w-12 h-14 rounded-lg overflow-hidden border border-frost-steel dark:border-steam-steel bg-frost-bg/70 dark:bg-steam-dark/60 shrink-0">
-                          {game.coverUrl ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
-                              src={game.coverUrl}
-                              alt={game.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-active-slate/40">
-                              <Gamepad2 className="w-5 h-5" />
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="font-bold text-charcoal-text dark:text-pure-white text-sm line-clamp-1">
-                          {game.title}
-                        </div>
-                        <div className="text-[11px] text-active-slate/70 dark:text-steam-light/60 line-clamp-1 max-w-xs">
-                          {game.description}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-sky-accent/15 dark:bg-steam-blue/20 text-sky-accent dark:text-steam-blue border border-sky-accent/30 dark:border-steam-blue/30 font-semibold">
-                          {game.genre?.name || 'General'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-active-slate dark:text-steam-light font-mono text-[11px]">
-                        <span className="inline-flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-sky-accent dark:text-steam-blue" />
-                          {game.releaseDate
-                            ? new Date(game.releaseDate).toLocaleDateString()
-                            : 'N/A'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold">
-                          <Star className="w-3 h-3 fill-emerald-500 text-emerald-500" />
-                          <span>
-                            {game.averageRating !== undefined && game.averageRating !== null
-                              ? game.averageRating.toFixed(1)
-                              : '0.0'}
-                          </span>
-                          <span className="text-[10px] text-active-slate/60 dark:text-steam-light/50 font-normal">
-                            ({game.reviews?.length || 0})
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="inline-flex items-center gap-1.5">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => handleOpenEditGame(game)}
-                            title="Editar videojuego"
-                            leftIcon={<Edit3 className="w-3.5 h-3.5" />}
-                          >
-                            Editar
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setGameToDelete(game)}
-                            title="Eliminar videojuego"
-                            leftIcon={<Trash2 className="w-3.5 h-3.5 text-rose-500" />}
-                          >
-                            Eliminar
-                          </Button>
-                        </div>
-                      </td>
+          <div className="space-y-4">
+            <div className="glass-panel rounded-3xl border border-frost-steel dark:border-steam-steel/50 overflow-hidden shadow-xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-frost-steel dark:border-steam-steel/30 bg-frost-bg/50 dark:bg-steam-steel/20 text-[11px] font-mono uppercase tracking-wider text-active-slate dark:text-steam-light">
+                      <th className="py-3.5 px-4 font-bold">Carátula</th>
+                      <th className="py-3.5 px-4 font-bold">Título</th>
+                      <th className="py-3.5 px-4 font-bold">Género</th>
+                      <th className="py-3.5 px-4 font-bold">Lanzamiento</th>
+                      <th className="py-3.5 px-4 font-bold">Valoración</th>
+                      <th className="py-3.5 px-4 font-bold text-right">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-frost-steel/60 dark:divide-steam-steel/20 text-xs">
+                    {games.map((game) => (
+                      <tr
+                        key={game.id}
+                        className="hover:bg-frost-bg/40 dark:hover:bg-steam-steel/10 transition-colors"
+                      >
+                        <td className="py-3 px-4">
+                          <div className="w-12 h-14 rounded-lg overflow-hidden border border-frost-steel dark:border-steam-steel bg-frost-bg/70 dark:bg-steam-dark/60 shrink-0">
+                            {game.coverUrl ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={game.coverUrl}
+                                alt={game.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-active-slate/40">
+                                <Gamepad2 className="w-5 h-5" />
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="font-bold text-charcoal-text dark:text-pure-white text-sm line-clamp-1">
+                            {game.title}
+                          </div>
+                          <div className="text-[11px] text-active-slate/70 dark:text-steam-light/60 line-clamp-1 max-w-xs">
+                            {game.description}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-sky-accent/15 dark:bg-steam-blue/20 text-sky-accent dark:text-steam-blue border border-sky-accent/30 dark:border-steam-blue/30 font-semibold">
+                            {game.genre?.name || 'General'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-active-slate dark:text-steam-light font-mono text-[11px]">
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-sky-accent dark:text-steam-blue" />
+                            {game.releaseDate
+                              ? new Date(game.releaseDate).toLocaleDateString()
+                              : 'N/A'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                            <Star className="w-3 h-3 fill-emerald-500 text-emerald-500" />
+                            <span>
+                              {game.averageRating !== undefined && game.averageRating !== null
+                                ? game.averageRating.toFixed(1)
+                                : '0.0'}
+                            </span>
+                            <span className="text-[10px] text-active-slate/60 dark:text-steam-light/50 font-normal">
+                              ({game.reviews?.length || 0})
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="inline-flex items-center gap-1.5">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => handleOpenEditGame(game)}
+                              title="Editar videojuego"
+                              leftIcon={<Edit3 className="w-3.5 h-3.5" />}
+                            >
+                              Editar
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setGameToDelete(game)}
+                              title="Eliminar videojuego"
+                              leftIcon={<Trash2 className="w-3.5 h-3.5 text-rose-500" />}
+                            >
+                              Eliminar
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
+
+            {/* Controles de Paginación Administrativa (5 juegos por página) */}
+            {pagination && (
+              <Pagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                isLoading={isLoadingGames}
+              />
+            )}
           </div>
         )}
       </section>

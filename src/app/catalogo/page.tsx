@@ -78,6 +78,14 @@ function CatalogoContent() {
     });
   };
 
+  // Sincronizar cuando el parámetro ?search= cambia desde el Topbar u otra navegación
+  useEffect(() => {
+    if (initialSearch !== filter.search) {
+      setSearchInput(initialSearch);
+      setFilter((prev) => ({ ...prev, search: initialSearch, page: 1 }));
+    }
+  }, [initialSearch]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Manejar cambio en la búsqueda con debounce sutil
   useEffect(() => {
     const timer = setTimeout(() => {

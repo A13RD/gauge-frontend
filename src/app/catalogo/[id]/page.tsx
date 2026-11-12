@@ -215,7 +215,7 @@ function GameDetailContent() {
             </div>
 
             {/* Título Monumental */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-sans uppercase tracking-tight leading-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-sans uppercase tracking-tight leading-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] break-words">
               {game.title}
             </h1>
 
@@ -226,12 +226,12 @@ function GameDetailContent() {
             </p>
 
             {/* BOTÓN PRINCIPAL: OPINAR (En sustitución del Pre-order ficticio de la referencia) */}
-            <div className="pt-3 flex flex-wrap items-center gap-4">
-              <Link href={`/resenas/nueva?gameId=${game.id}`}>
+            <div className="pt-3 flex flex-wrap items-center gap-3 sm:gap-4">
+              <Link href={`/resenas/nueva?gameId=${game.id}`} className="w-full sm:w-auto">
                 <Button
                   variant="primary"
                   size="lg"
-                  className="px-8 py-3.5 text-base font-bold tracking-wide uppercase shadow-[0_0_25px_rgba(102,192,244,0.45)] hover:shadow-[0_0_35px_rgba(102,192,244,0.65)] transform hover:scale-[1.02] transition-all"
+                  className="w-full sm:w-auto px-8 py-3.5 text-base font-bold tracking-wide uppercase shadow-[0_0_25px_rgba(102,192,244,0.45)] hover:shadow-[0_0_35px_rgba(102,192,244,0.65)] transform hover:scale-[1.02] transition-all"
                   leftIcon={<SquarePen className="w-5 h-5" />}
                 >
                   Opinar
@@ -241,9 +241,9 @@ function GameDetailContent() {
               <button
                 type="button"
                 onClick={handleScrollToReviews}
-                className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs sm:text-sm font-mono text-white backdrop-blur-md transition-colors flex items-center gap-2"
+                className="w-full sm:w-auto justify-center px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs sm:text-sm font-mono text-white backdrop-blur-md transition-colors flex items-center gap-2"
               >
-                <MessageSquareText className="w-4 h-4 text-steam-blue" />
+                <MessageSquareText className="w-4 h-4 text-steam-blue shrink-0" />
                 <span>Explorar opiniones ({reviews.length})</span>
               </button>
             </div>
@@ -327,13 +327,16 @@ function GameDetailContent() {
             </div>
           </div>
 
-          <Link href={`/resenas/nueva?gameId=${game.id}`}>
+          <Link href={`/resenas/nueva?gameId=${game.id}`} className="max-w-full">
             <Button
               variant="primary"
               size="sm"
-              leftIcon={<SquarePen className="w-3.5 h-3.5" />}
+              className="max-w-full"
+              leftIcon={<SquarePen className="w-3.5 h-3.5 shrink-0" />}
             >
-              Opinar sobre {game.title}
+              <span className="truncate max-w-[220px] sm:max-w-xs">
+                Opinar sobre {game.title}
+              </span>
             </Button>
           </Link>
         </div>

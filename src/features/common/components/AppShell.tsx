@@ -35,11 +35,11 @@ export function AppShell({
   }, []);
 
   return (
-    <div className="relative z-10 min-h-screen lg:h-screen lg:overflow-hidden bg-transparent text-gauge-text-primary flex flex-col antialiased selection:bg-sky-accent dark:selection:bg-steam-blue selection:text-white dark:selection:text-steam-dark overflow-x-hidden">
-      {/* Contenedor maestro con distribución de 3 zonas en escritorio */}
-      <div className="flex-1 flex w-full max-w-[1700px] mx-auto p-2.5 sm:p-4 md:p-6 gap-4 lg:gap-6 relative lg:h-full lg:overflow-hidden">
-        {/* ZONA 1: Sidebar de escritorio (Isla flotante FIJA en viewport) */}
-        <Suspense fallback={<div className="hidden lg:block w-64 shrink-0 h-full" />}>
+    <div className="relative z-10 min-h-screen bg-transparent text-gauge-text-primary flex flex-col antialiased selection:bg-sky-accent dark:selection:bg-steam-blue selection:text-white dark:selection:text-steam-dark overflow-x-clip">
+      {/* Contenedor maestro con distribución de 3 zonas en escritorio (scroll natural de ventana) */}
+      <div className="flex-1 flex items-start w-full max-w-[1700px] mx-auto p-2.5 sm:p-4 md:p-6 gap-4 lg:gap-6 relative">
+        {/* ZONA 1: Sidebar de escritorio (Isla flotante sticky en viewport) */}
+        <Suspense fallback={<div className="hidden lg:block w-20 shrink-0 h-[calc(100dvh-3rem)]" />}>
           <Sidebar
             isExpanded={isSidebarExpanded}
             onToggleExpanded={handleToggleSidebar}
@@ -47,16 +47,16 @@ export function AppShell({
           />
         </Suspense>
 
-        {/* ZONA 2: Área central independiente (Scroll vertical exclusivo en escritorio) */}
-        <div className="flex-1 flex flex-col min-w-0 lg:h-full lg:overflow-y-auto pr-0 lg:pr-2 scrollbar-thin">
-          <Topbar onOpenMobileMenu={handleOpenMobileMenu} className="sticky top-0 z-20 shrink-0 mb-4 lg:mb-6" />
+        {/* ZONA 2: Área central (Scroll natural del documento sin barra interna) */}
+        <div className="flex-1 flex flex-col min-w-0">
+          <Topbar onOpenMobileMenu={handleOpenMobileMenu} className="sticky top-2.5 sm:top-4 md:top-6 z-30 shrink-0 mb-4 lg:mb-6" />
 
           <main className="flex-1 flex flex-col min-w-0 pb-24 lg:pb-6">
             {children}
           </main>
         </div>
 
-        {/* ZONA 3: RightDock derecho (FIJO en viewport, no se estira con el scroll) */}
+        {/* ZONA 3: RightDock derecho (Sticky en viewport, sin barra interna) */}
         {showRightDock && (
           <RightDock>
             {rightDockContent}

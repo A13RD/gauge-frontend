@@ -8,6 +8,7 @@ import { LoginFormErrors } from '../domain/auth.types';
 import { HttpClientError } from '@/features/common/http';
 import { Button } from '@/features/common/components/Button';
 import { ErrorAlert } from '@/features/common/components/ErrorAlert';
+import { BrandLogo } from '@/features/common/components/BrandLogo';
 import {
   Mail,
   Lock,
@@ -90,7 +91,8 @@ export function LoginForm() {
     <div className="w-full max-w-md mx-auto">
       <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-frost-steel dark:border-steam-steel/50 shadow-2xl space-y-6">
         {/* Cabecera del Formulario */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-2.5 flex flex-col items-center">
+          <BrandLogo size="md" showText={false} interactive={false} />
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-sky-accent/15 dark:bg-steam-blue/20 text-sky-accent dark:text-steam-blue border border-sky-accent/30 dark:border-steam-blue/40">
             <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
             ACCESO AUTORIZADO · GAUGE

@@ -32,12 +32,12 @@ export function HeroValorantCard({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imgError, setImgError] = useState(false);
 
-  // 1. Estado de Carga (Skeleton Neo-Arcade)
+  // 1. Estado de Carga (Skeleton Neo-Arcade con dimensiones fijas idénticas al Hero)
   if (isLoading) {
     return (
       <section
         aria-label="Cargando videojuego destacado"
-        className={`relative glass-panel rounded-3xl p-6 sm:p-8 md:p-10 overflow-hidden border border-frost-steel dark:border-steam-steel/40 shadow-2xl animate-pulse min-h-[340px] flex flex-col justify-between ${className}`}
+        className={`relative glass-panel rounded-3xl p-6 sm:p-8 md:p-10 overflow-hidden border border-frost-steel dark:border-steam-steel/40 shadow-2xl animate-pulse w-full h-[380px] sm:h-[400px] md:h-[420px] flex flex-col justify-between ${className}`}
       >
         <div className="flex flex-col gap-4 max-w-xl">
           <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export function HeroValorantCard({
   return (
     <section
       aria-label={`Videojuego destacado: ${currentGame.title}`}
-      className={`relative glass-panel rounded-3xl p-6 sm:p-8 md:p-10 overflow-hidden border border-frost-steel dark:border-steam-steel/40 shadow-2xl transition-all group min-h-[360px] flex flex-col justify-between ${className}`}
+      className={`relative glass-panel rounded-3xl p-6 sm:p-8 md:p-10 overflow-hidden border border-frost-steel dark:border-steam-steel/40 shadow-2xl transition-all group w-full h-[380px] sm:h-[400px] md:h-[420px] flex flex-col justify-between ${className}`}
     >
       {/* Fondo inmersivo con imagen del juego */}
       {bannerSource && !imgError && (
@@ -166,13 +166,13 @@ export function HeroValorantCard({
         className="absolute inset-0 z-0 bg-gradient-to-r from-frost-bg/95 via-frost-bg/85 to-transparent dark:from-steam-navy/95 dark:via-steam-navy/85 dark:to-steam-dark/60 pointer-events-none"
       />
 
-      <div className="relative z-10 flex flex-col justify-between h-full gap-6">
-        {/* Encabezado: Insignias de recomendación, género y puntuación */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+        {/* Encabezado fijo: Insignias de recomendación, género y puntuación */}
+        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 min-h-[2rem]">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-sky-accent/15 dark:bg-steam-blue/20 text-sky-accent dark:text-steam-blue border border-sky-accent/30 dark:border-steam-blue/40 shadow-xs">
-              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-              DESTACADO DE LA COMUNIDAD
+              <Sparkles className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              <span className="truncate">DESTACADO DE LA COMUNIDAD</span>
             </span>
 
             {currentGame.genre && (
@@ -183,9 +183,9 @@ export function HeroValorantCard({
           </div>
 
           {/* Insignia de Calificación */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-steam-dark border border-frost-steel dark:border-steam-steel/50 shadow-sm">
-              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-hidden="true" />
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" aria-hidden="true" />
               <span className="text-xs font-mono font-bold text-charcoal-text dark:text-pure-white">
                 {rating !== null ? `${rating.toFixed(1)} / 10` : 'Sin reseñas'}
               </span>
@@ -196,18 +196,26 @@ export function HeroValorantCard({
           </div>
         </div>
 
-        {/* Contenido principal del juego */}
-        <div className="max-w-xl space-y-3">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-charcoal-text dark:text-pure-white font-sans uppercase line-clamp-2">
-            {currentGame.title}
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-active-slate dark:text-steam-light leading-relaxed line-clamp-3">
-            {currentGame.description || 'Explora el análisis técnico, tiempos promedio y evaluaciones fundamentadas de la comunidad sobre este título.'}
-          </p>
+        {/* Contenido principal con altura fija para título y sinopsis (sin saltos entre slides) */}
+        <div className="max-w-xl my-auto flex flex-col justify-center gap-2.5 overflow-hidden">
+          <div className="h-[3.5rem] sm:h-[4.25rem] md:h-[5rem] flex items-end overflow-hidden">
+            <h1
+              title={currentGame.title}
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-black tracking-tight text-charcoal-text dark:text-pure-white font-sans uppercase leading-tight line-clamp-2 text-ellipsis overflow-hidden"
+            >
+              {currentGame.title}
+            </h1>
+          </div>
+          <div className="h-[3.75rem] sm:h-[4.5rem] overflow-hidden">
+            <p className="text-xs sm:text-sm md:text-base text-active-slate dark:text-steam-light leading-relaxed line-clamp-3 text-ellipsis overflow-hidden">
+              {currentGame.description ||
+                'Explora el análisis técnico, tiempos promedio y evaluaciones fundamentadas de la comunidad sobre este título.'}
+            </p>
+          </div>
         </div>
 
-        {/* Acciones principales y controles del carrusel */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-frost-steel/60 dark:border-steam-steel/30">
+        {/* Acciones principales y controles del carrusel alineados al fondo */}
+        <div className="shrink-0 mt-auto flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-frost-steel/60 dark:border-steam-steel/30">
           <div className="flex items-center gap-3">
             <Link href={`/catalogo/${currentGame.id}`}>
               <Button

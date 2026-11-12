@@ -32,9 +32,9 @@ export function RightDock({
   return (
     <aside
       aria-label="Panel lateral complementario"
-      className={`hidden xl:flex flex-col w-80 shrink-0 z-20 self-start lg:h-full ${className}`}
+      className={`hidden xl:flex flex-col w-80 shrink-0 z-20 self-start xl:sticky xl:top-6 ${className}`}
     >
-      <div className="glass-panel h-full flex flex-col p-5 rounded-3xl border border-frost-steel dark:border-steam-steel/40 shadow-2xl transition-all gap-5 overflow-y-auto">
+      <div className="glass-panel flex flex-col p-5 rounded-3xl border border-frost-steel dark:border-steam-steel/40 shadow-2xl transition-all gap-5 overflow-hidden">
         {/* Encabezado del Dock */}
         <div className="flex items-center justify-between pb-3 border-b border-frost-steel dark:border-steam-steel/30 shrink-0">
           <div className="flex items-center gap-2">

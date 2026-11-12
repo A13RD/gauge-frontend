@@ -11,8 +11,8 @@ import {
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
-  Gauge as GaugeIcon,
 } from 'lucide-react';
+import { BrandLogo } from './BrandLogo';
 
 export interface NavItem {
   label: string;
@@ -67,7 +67,7 @@ export function Sidebar({
   return (
     <aside
       aria-label="Navegación principal de escritorio"
-      className={`hidden lg:flex flex-col z-30 transition-all duration-300 ease-in-out shrink-0 self-start lg:h-full max-h-full ${
+      className={`hidden lg:flex flex-col z-30 transition-all duration-300 ease-in-out shrink-0 self-start lg:sticky lg:top-6 lg:h-[calc(100dvh-3rem)] ${
         isExpanded ? 'w-60' : 'w-20'
       } ${className}`}
     >
@@ -89,21 +89,11 @@ export function Sidebar({
               isExpanded ? 'justify-between px-3' : 'justify-center'
             }`}
           >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-steam-blue/20 border border-steam-blue/40 flex items-center justify-center text-sky-accent dark:text-steam-blue shrink-0 group-hover:scale-105 transition-transform shadow-[0_0_12px_rgba(102,192,244,0.3)]">
-                <GaugeIcon className="w-6 h-6" aria-hidden="true" />
-              </div>
-              {isExpanded && (
-                <div className="flex flex-col text-left overflow-hidden">
-                  <span className="font-extrabold tracking-wider text-base text-charcoal-text dark:text-pure-white font-mono">
-                    GAUGE
-                  </span>
-                  <span className="text-[10px] text-active-slate/70 dark:text-steam-light/70 tracking-tight truncate">
-                    Arcade Matrix
-                  </span>
-                </div>
-              )}
-            </div>
+            <BrandLogo
+              size="md"
+              showText={isExpanded}
+              subtitle="Arcade Matrix"
+            />
 
             {isExpanded ? (
               <ChevronLeft className="w-4 h-4 text-active-slate/60 dark:text-steam-light/60 group-hover:text-sky-accent dark:group-hover:text-steam-blue transition-colors shrink-0" aria-hidden="true" />
