@@ -40,7 +40,13 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-gauge-bg text-gauge-text-primary antialiased selection:bg-steam-blue selection:text-steam-dark font-sans">
+      <body className="min-h-screen bg-gauge-bg text-gauge-text-primary antialiased selection:bg-steam-blue selection:text-steam-dark font-sans relative">
+        {/* Capa de fondo ambiental responsive de GAUGE */}
+        <div className="gauge-ambient-bg" aria-hidden="true">
+          <div className="gauge-ambient-img" />
+          <div className="gauge-ambient-overlay" />
+        </div>
+
         <ThemeProvider>
           <AuthProvider>
             {children}

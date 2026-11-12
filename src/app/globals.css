@@ -217,3 +217,68 @@ html.light {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   Fondo Ambiental Responsive de GAUGE (Pixel Art Gothic Castle)
+   ========================================================================== */
+
+.gauge-ambient-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background-color: var(--gauge-bg);
+}
+
+.gauge-ambient-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center bottom;
+  /* Móvil por defecto (Mobile-first para resoluciones < 768px) */
+  background-image: url('/images/backgrounds/gauge-bg-mobile.jpg');
+  opacity: 0.22; /* Rango especificado: 0.18 a 0.28 */
+  transform: translateZ(0);
+  will-change: opacity;
+  transition: opacity 0.3s ease;
+}
+
+/* Escritorio y pantallas grandes (>= 768px): fondo panorámico */
+@media (min-width: 768px) {
+  .gauge-ambient-img {
+    background-image: url('/images/backgrounds/gauge-bg-desktop.jpg');
+    background-position: center bottom;
+  }
+}
+
+/* Capa de overlay para contraste y atmósfera visual */
+.gauge-ambient-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Dark mode: degradado radial oscuro que preserva la luna y viñetea los bordes */
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(27, 40, 56, 0.45) 0%,
+    rgba(23, 26, 33, 0.72) 100%
+  );
+  transition: background 0.3s ease;
+}
+
+/* Compatibilidad con Light Mode (Clean Frost Arcade) */
+html.light .gauge-ambient-img {
+  opacity: 0.08; /* Sutil para preservar contraste con textos oscuros */
+}
+
+html.light .gauge-ambient-overlay {
+  background: rgba(240, 244, 248, 0.88); /* Overlay frost de alta claridad */
+}
+

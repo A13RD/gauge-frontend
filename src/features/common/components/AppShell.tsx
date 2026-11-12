@@ -35,7 +35,7 @@ export function AppShell({
   }, []);
 
   return (
-    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-gauge-bg text-gauge-text-primary flex flex-col antialiased selection:bg-sky-accent dark:selection:bg-steam-blue selection:text-white dark:selection:text-steam-dark overflow-x-hidden">
+    <div className="relative z-10 min-h-screen lg:h-screen lg:overflow-hidden bg-transparent text-gauge-text-primary flex flex-col antialiased selection:bg-sky-accent dark:selection:bg-steam-blue selection:text-white dark:selection:text-steam-dark overflow-x-hidden">
       {/* Contenedor maestro con distribución de 3 zonas en escritorio */}
       <div className="flex-1 flex w-full max-w-[1700px] mx-auto p-2.5 sm:p-4 md:p-6 gap-4 lg:gap-6 relative lg:h-full lg:overflow-hidden">
         {/* ZONA 1: Sidebar de escritorio (Isla flotante FIJA en viewport) */}
